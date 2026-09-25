@@ -14,8 +14,6 @@ data class DeviceInfo(
     val displayWidth: Int = 0,
     val displayHeight: Int = 0,
     val displayDensity: Float = 0f,
-    val touchDevicePath: String? = null,
-    val touchDeviceName: String? = null,
 )
 
 data class CapabilityReport(

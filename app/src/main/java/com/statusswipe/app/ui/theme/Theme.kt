@@ -3,50 +3,81 @@ package com.statusswipe.app.ui.theme
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SliderColors
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = AmberPrimary,
-    onPrimary = SurfaceOled,
-    primaryContainer = AmberContainer,
-    onPrimaryContainer = OnAmberContainer,
-    secondary = AmberPrimaryDark,
-    onSecondary = SurfaceOled,
-    background = SurfaceOled,
-    onBackground = TextPrimary,
-    surface = SurfaceElevated,
-    onSurface = TextPrimary,
-    surfaceVariant = SurfaceCard,
-    onSurfaceVariant = TextSecondary,
-    outline = SurfaceCardBorder,
-    error = CrimsonError,
-    errorContainer = CrimsonContainer,
-    onErrorContainer = TextPrimary
+    primary = NothingRed,
+    onPrimary = NothingBlack,
+    primaryContainer = NothingCharcoal,
+    onPrimaryContainer = NothingRed,
+    secondary = NothingLavender,
+    onSecondary = NothingBlack,
+    background = NothingBlack,
+    onBackground = NothingWhite,
+    surface = NothingCharcoal,
+    onSurface = NothingWhite,
+    surfaceVariant = NothingButtonSurface,
+    onSurfaceVariant = NothingGrey,
+    outline = NothingBorder,
+    error = NothingError,
+    errorContainer = NothingCharcoal,
+    onErrorContainer = NothingRed
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = AmberPrimaryDark,
-    onPrimary = LightSurface,
-    primaryContainer = AmberContainer,
-    onPrimaryContainer = AmberPrimaryDark,
-    background = LightSurface,
+    primary = LightWarmAmber,
+    onPrimary = NothingWhite,
+    primaryContainer = LightSurface,
+    onPrimaryContainer = LightWarmAmber,
+    secondary = NothingRed,
+    onSecondary = NothingWhite,
+    background = LightStoneCream,
     onBackground = LightTextPrimary,
-    surface = LightSurfaceCard,
+    surface = LightSurface,
     onSurface = LightTextPrimary,
-    surfaceVariant = LightSurfaceCard,
+    surfaceVariant = LightStoneCream,
     onSurfaceVariant = LightTextSecondary,
-    outline = LightCardBorder
+    outline = LightBorder,
+    error = NothingError,
+    errorContainer = LightSurface,
+    onErrorContainer = NothingRed
 )
+
+object NothingTheme {
+    @Composable
+    fun switchColors(): SwitchColors = SwitchDefaults.colors(
+        checkedThumbColor = NothingRed,
+        checkedTrackColor = Color.Transparent,
+        checkedBorderColor = NothingBorder,
+        uncheckedThumbColor = NothingGrey,
+        uncheckedTrackColor = Color.Transparent,
+        uncheckedBorderColor = NothingBorder
+    )
+
+    @Composable
+    fun sliderColors(): SliderColors = SliderDefaults.colors(
+        thumbColor = NothingRed,
+        activeTrackColor = NothingRed,
+        inactiveTrackColor = NothingCharcoal,
+        activeTickColor = NothingBlack,
+        inactiveTickColor = NothingGrey
+    )
+}
 
 @Composable
 fun StatusSwipeTheme(
-    darkTheme: Boolean = true, // Default to sleek dark mode for utility tool
+    darkTheme: Boolean = true, // Force dark theme by default based on Nothing OS vibe
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
@@ -54,6 +85,10 @@ fun StatusSwipeTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
+            @Suppress("DEPRECATION")
+            window.statusBarColor = (if (darkTheme) NothingBlack else LightStoneCream).toArgb()
+            @Suppress("DEPRECATION")
+            window.navigationBarColor = (if (darkTheme) NothingBlack else LightStoneCream).toArgb()
             WindowCompat.getInsetsController(window, view).apply {
                 isAppearanceLightStatusBars = !darkTheme
                 isAppearanceLightNavigationBars = !darkTheme

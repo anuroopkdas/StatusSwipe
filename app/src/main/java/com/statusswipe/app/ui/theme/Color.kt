@@ -2,34 +2,21 @@ package com.statusswipe.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand accents - Solar Amber & Flame
-val AmberPrimary = Color(0xFFFF9E0B)
-val AmberPrimaryDark = Color(0xFFF59E0B)
-val AmberGlow = Color(0x33F59E0B)
-val AmberContainer = Color(0x26FFB020)
-val OnAmberContainer = Color(0xFFFFD599)
+// Nothing OS Dark Theme Tokens
+val NothingBlack = Color(0xFF000000) // True AMOLED Black
+val NothingCharcoal = Color(0xFF1D1E20) // Container Surface
+val NothingRed = Color(0xFFFF1A1A) // Primary Accent
+val NothingWhite = Color(0xFFFFFFFF) // Text Primary
+val NothingGrey = Color(0xFFA3A3A3) // Text Secondary
+val NothingBorder = Color(0xFF3B3B3B) // Border / Outline
+val NothingLavender = Color(0xFFE9E9FA) // Badge Highlight
+val NothingButtonSurface = Color(0xFF333333) // Button Surface
+val NothingError = Color(0xFFFF1A1A) // Error (using Nothing Red)
 
-// Status colors
-val EmeraldSuccess = Color(0xFF10B981)
-val EmeraldContainer = Color(0x2610B981)
-val CrimsonError = Color(0xFFEF4444)
-val CrimsonContainer = Color(0x26EF4444)
-
-// Neutral surfaces (Deep OLED black & rich charcoal)
-val SurfaceOled = Color(0xFF0A0A0C)
-val SurfaceElevated = Color(0xFF141418)
-val SurfaceCard = Color(0xFF1A1A20)
-val SurfaceCardBorder = Color(0xFF262630)
-val SurfaceCardHover = Color(0xFF22222A)
-
-// Text shades
-val TextPrimary = Color(0xFFF3F4F6)
-val TextSecondary = Color(0xFF9CA3AF)
-val TextTertiary = Color(0xFF6B7280)
-
-// Light theme fallbacks
-val LightSurface = Color(0xFFF8F9FA)
-val LightSurfaceCard = Color(0xFFFFFFFF)
-val LightCardBorder = Color(0xFFE5E7EB)
-val LightTextPrimary = Color(0xFF111827)
-val LightTextSecondary = Color(0xFF4B5563)
+// Light Theme Fallbacks
+val LightStoneCream = Color(0xFFE6E4D7) // Background
+val LightWarmAmber = Color(0xFFE98E3A) // Secondary Accent
+val LightTextPrimary = Color(0xFF000000)
+val LightTextSecondary = Color(0xFF3B3B3B)
+val LightSurface = Color(0xFFFFFFFF)
+val LightBorder = Color(0xFFB0B0B0)

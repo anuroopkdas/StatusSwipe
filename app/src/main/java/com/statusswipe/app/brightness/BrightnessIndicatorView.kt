@@ -14,6 +14,8 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
+import com.statusswipe.app.R
 import kotlin.math.roundToInt
 
 /**
@@ -98,16 +100,16 @@ class BrightnessIndicatorView(private val context: Context) {
 
         val background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = 16f * density
-            setColor(Color.parseColor("#D918181A")) // Soft translucent dark pill
-            setStroke((0.8f * density).toInt(), Color.parseColor("#26FFFFFF"))
+            cornerRadius = 50f * density
+            setColor(Color.parseColor("#E6000000")) // True black at 90% opacity
+            setStroke((0.5f * density).coerceAtLeast(1f).toInt(), Color.parseColor("#3B3B3B"))
         }
 
         textView = TextView(context).apply {
             this.background = background
             setTextColor(Color.WHITE)
-            textSize = 13f
-            typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+            textSize = 14f
+            typeface = ResourcesCompat.getFont(context, R.font.ndot) ?: Typeface.MONOSPACE
             gravity = Gravity.CENTER
             setPadding(
                 (14 * density).toInt(),

@@ -2,7 +2,9 @@ package com.statusswipe.app.ui
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +24,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.statusswipe.app.ui.theme.NDotFamily
 import com.statusswipe.app.brightness.BrightnessIndicatorView
 import com.statusswipe.app.capability.CapabilityDetector
 import com.statusswipe.app.service.GestureService
@@ -78,14 +81,23 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
     val screenHeightPx = displayMetrics.heightPixels
     val currentZonePx = (screenHeightPx * gestureZone).roundToInt()
 
-    // Minimal palette: Deep clean dark surfaces
-    val bg = Color(0xFF0C0C0E)
-    val cardBg = Color(0xFF18181B)
-    val cardBorder = Color(0xFF242428)
-    val textPrimary = Color(0xFFF4F4F5)
-    val textSecondary = Color(0xFFA1A1AA)
-    val textMuted = Color(0xFF71717A)
-    val accent = Color(0xFFE4E4E7) // Clean neutral white/silver accent
+    // Nothing OS Color Palette
+    val bg = Color.Black
+    val cardBg = Color(0xFF1D1E20)
+    val cardBorder = Color(0xFF3B3B3B)
+    val textPrimary = Color.White
+    val textSecondary = Color(0xFFA3A3A3)
+    val textMuted = Color(0xFF666666)
+    val accent = Color(0xFFFF1A1A)
+
+    val customSwitchColors = SwitchDefaults.colors(
+        checkedThumbColor = accent,
+        checkedTrackColor = Color.Transparent,
+        checkedBorderColor = accent,
+        uncheckedThumbColor = textSecondary,
+        uncheckedTrackColor = Color.Transparent,
+        uncheckedBorderColor = cardBorder
+    )
 
     Column(
         modifier = Modifier
@@ -98,42 +110,58 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Large Title
-        Text(
-            text = "StatusSwipe",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = (-0.5).sp
-            ),
-            color = textPrimary,
+        // App Title
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
-        )
+        ) {
+            Text(
+                text = "STATUS SWIPE",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = 2.sp,
+                    fontFamily = NDotFamily,
+                    fontSize = 26.sp
+                ),
+                color = textPrimary
+            )
+            if (isRunning) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(accent, CircleShape)
+                )
+            }
+        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Master Switch Bar (Android Settings Style) ---
+        // --- Master Switch Bar ---
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            color = if (isRunning) Color(0xFF27272A) else cardBg,
-            border = androidx.compose.foundation.BorderStroke(1.dp, cardBorder)
+            shape = RoundedCornerShape(16.dp),
+            color = cardBg,
+            border = BorderStroke(0.5.dp, cardBorder)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 18.dp),
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Use StatusSwipe",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
                         color = textPrimary
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = if (isRunning) "Swipe top edge to adjust brightness" else "Disabled",
+                        text = if (isRunning) "Swipe status bar to adjust brightness" else "Disabled",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (isRunning) textSecondary else textMuted
                     )
@@ -159,14 +187,15 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                                 context.startActivity(intent)
                             }
                         }
-                    }
+                    },
+                    colors = customSwitchColors
                 )
             }
         }
 
-        // Warning banner if non-root and accessibility service is not enabled
+        // Warning banner
         if (!isUsingRoot && !isA11yEnabledInSystem) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,49 +205,52 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                         }
                         context.startActivity(intent)
                     },
-                shape = RoundedCornerShape(18.dp),
-                color = Color(0xFF2E1A1A),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF7F1D1D))
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0x33FF1A1A),
+                border = BorderStroke(1.dp, accent)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Accessibility service required",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
-                            color = Color(0xFFFCA5A5)
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Medium
+                            ),
+                            color = accent
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Tap to enable StatusSwipe in Accessibility settings",
+                            text = "Tap to enable StatusSwipe in Settings",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFF87171)
+                            color = textPrimary
                         )
                     }
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                         contentDescription = null,
-                        tint = Color(0xFFFCA5A5),
+                        tint = accent,
                         modifier = Modifier.size(14.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // --- SECTION: GESTURE ---
         SectionHeader("GESTURE")
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(16.dp),
             color = cardBg,
-            border = androidx.compose.foundation.BorderStroke(1.dp, cardBorder)
+            border = BorderStroke(0.5.dp, cardBorder)
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                // 1. Gesture Zone Slider with Preview
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+                // 1. Gesture Zone Slider
                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -228,7 +260,7 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                         Column {
                             Text(
                                 text = "Gesture zone",
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
                                 color = textPrimary
                             )
                             Text(
@@ -238,23 +270,29 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                             )
                         }
 
-                        Text(
-                            text = "$currentZonePx px (${(gestureZone * 100).roundToInt()}%)",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.Normal
-                            ),
-                            color = textSecondary
-                        )
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = Color(0xFF333333)
+                        ) {
+                            Text(
+                                text = "$currentZonePx px",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontFamily = NDotFamily,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = 1.sp
+                                ),
+                                color = textPrimary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Slider(
+                    NothingSlider(
                         value = gestureZone,
                         onValueChange = {
                             gestureZone = it
-                            // Live minimal overlay preview across top edge
                             GestureZonePreviewOverlay.updateZone(context, it, isDragging = true)
                         },
                         onValueChangeFinished = {
@@ -266,7 +304,7 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                     )
                 }
 
-                HorizontalDivider(color = cardBorder)
+                HorizontalDivider(color = cardBorder, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                 // 2. Sensitivity Slider
                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -278,7 +316,7 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                         Column {
                             Text(
                                 text = "Sensitivity",
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
                                 color = textPrimary
                             )
                             Text(
@@ -288,19 +326,26 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                             )
                         }
 
-                        Text(
-                            text = String.format("%.1f×", sensitivity),
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.Normal
-                            ),
-                            color = textSecondary
-                        )
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = Color(0xFF333333)
+                        ) {
+                            Text(
+                                text = String.format("%.1fx", sensitivity),
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontFamily = NDotFamily,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = 1.sp
+                                ),
+                                color = textPrimary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Slider(
+                    NothingSlider(
                         value = sensitivity,
                         onValueChange = { sensitivity = it },
                         onValueChangeFinished = {
@@ -311,7 +356,7 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                     )
                 }
 
-                HorizontalDivider(color = cardBorder)
+                HorizontalDivider(color = cardBorder, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                 // 3. Invert direction switch
                 MinimalSwitchRow(
@@ -322,23 +367,24 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                         invertDirection = it
                         preferences.invertDirection = it
                         updateActiveService()
-                    }
+                    },
+                    switchColors = customSwitchColors
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // --- SECTION: FEEDBACK ---
         SectionHeader("FEEDBACK")
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(16.dp),
             color = cardBg,
-            border = androidx.compose.foundation.BorderStroke(1.dp, cardBorder)
+            border = BorderStroke(0.5.dp, cardBorder)
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 // Brightness pill switch
                 MinimalSwitchRow(
                     title = "Brightness indicator",
@@ -348,43 +394,44 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                         showIndicator = it
                         preferences.showBrightnessIndicator = it
                         if (it) BrightnessIndicatorView.showPreview(context, 65)
-                    }
+                    },
+                    switchColors = customSwitchColors
                 )
 
-                HorizontalDivider(color = cardBorder)
+                HorizontalDivider(color = cardBorder, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp))
 
                 // Adaptive override switch
                 MinimalSwitchRow(
-                    title = "Lock to manual on gesture",
+                    title = "Lock to manual",
                     subtitle = "Disables auto-brightness when adjusting",
                     checked = disableAdaptive,
                     onCheckedChange = {
                         disableAdaptive = it
                         preferences.disableAdaptiveOnGesture = it
                         updateActiveService()
-                    }
+                    },
+                    switchColors = customSwitchColors
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // --- SECTION: SYSTEM ---
         SectionHeader("SYSTEM")
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(16.dp),
             color = cardBg,
-            border = androidx.compose.foundation.BorderStroke(1.dp, cardBorder)
+            border = BorderStroke(0.5.dp, cardBorder)
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 // Operation mode row
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable(enabled = isRooted) {
-                            // Cycle between Auto -> Root -> Accessibility if rooted
                             val nextMode = when (inputMode) {
                                 "auto" -> "root"
                                 "root" -> "accessibility"
@@ -409,7 +456,7 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Touch detection mode",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
                             color = textPrimary
                         )
                         Text(
@@ -424,26 +471,23 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                     }
 
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (isUsingRoot) Color(0xFF1E293B) else Color(0xFF1C2A1E),
-                        border = androidx.compose.foundation.BorderStroke(
-                            1.dp,
-                            if (isUsingRoot) Color(0xFF334155) else Color(0xFF2E4D34)
-                        )
+                        shape = RoundedCornerShape(50),
+                        color = if (isUsingRoot) accent else Color(0xFF333333)
                     ) {
                         Text(
                             text = if (isUsingRoot) "ROOT" else "NON-ROOT",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.5.sp
+                                fontWeight = FontWeight.Normal,
+                                letterSpacing = 1.5.sp,
+                                fontFamily = NDotFamily
                             ),
-                            color = if (isUsingRoot) Color(0xFF93C5FD) else Color(0xFF86EFAC),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            color = if (isUsingRoot) Color.Black else textPrimary,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
                     }
                 }
 
-                HorizontalDivider(color = cardBorder)
+                HorizontalDivider(color = cardBorder, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp))
 
                 // Diagnostics row
                 Row(
@@ -457,7 +501,7 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                     Column {
                         Text(
                             text = "Diagnostics",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
                             color = textPrimary
                         )
                         Text(
@@ -471,13 +515,13 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                         contentDescription = null,
                         tint = textMuted,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(12.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(48.dp))
     }
 }
 
@@ -485,12 +529,13 @@ fun MainScreen(onNavigateToDiagnostics: () -> Unit) {
 private fun SectionHeader(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.labelSmall.copy(
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.2.sp
+        style = MaterialTheme.typography.labelMedium.copy(
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 2.sp,
+            fontFamily = NDotFamily
         ),
-        color = Color(0xFF71717A),
-        modifier = Modifier.padding(start = 12.dp, bottom = 8.dp)
+        color = Color(0xFFA3A3A3),
+        modifier = Modifier.padding(start = 12.dp, bottom = 12.dp)
     )
 }
 
@@ -499,26 +544,27 @@ private fun MinimalSwitchRow(
     title: String,
     subtitle: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    switchColors: SwitchColors
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                color = Color(0xFFF4F4F5)
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Normal),
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFFA1A1AA)
+                color = Color(0xFFA3A3A3)
             )
         }
 
@@ -526,7 +572,58 @@ private fun MinimalSwitchRow(
 
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            colors = switchColors
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NothingSlider(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    onValueChangeFinished: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val accent = Color(0xFFFF1A1A)
+    val inactiveTrackColor = Color(0xFF27272A)
+
+    Slider(
+        value = value,
+        onValueChange = onValueChange,
+        onValueChangeFinished = onValueChangeFinished,
+        valueRange = valueRange,
+        modifier = modifier,
+        thumb = {
+            // Nothing Phone hardware tactile dial puck
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .background(accent, CircleShape)
+                    .border(2.dp, Color.Black, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                // Center pin dot
+                Box(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .background(Color.White.copy(alpha = 0.9f), CircleShape)
+                )
+            }
+        },
+        track = { sliderState ->
+            SliderDefaults.Track(
+                sliderState = sliderState,
+                modifier = Modifier.height(6.dp),
+                colors = SliderDefaults.colors(
+                    activeTrackColor = accent,
+                    inactiveTrackColor = inactiveTrackColor
+                ),
+                drawStopIndicator = null,
+                thumbTrackGapSize = 0.dp
+            )
+        }
+    )
 }

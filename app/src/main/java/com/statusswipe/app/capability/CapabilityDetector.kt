@@ -45,20 +45,59 @@ class CapabilityDetector(private val context: Context) {
         val errors = mutableListOf<String>()
 
         // 1. Root
-        val isRooted = Shell.isAppGrantedRoot() == true
+        val isRooted = Shell.isAppGrantedRoot() ?: try {
+            Shell.getShell().isRoot
+        } catch (_: Exception) {
+            false
+        }
 
         // 2. Accessibility Service (Non-Root Input)
         val isAccessibilityEnabled = isAccessibilityServiceEnabled()
 
-        // 3. SELinux
+        // 3. SELinux (Enforcement Mode)
         var selinuxStatus = "unknown"
+
         if (isRooted) {
-            val result = Shell.cmd("getenforce").exec()
-            if (result.isSuccess && result.out.isNotEmpty()) {
-                selinuxStatus = result.out.first()
-            } else {
-                errors.add("Failed to get SELinux status")
-            }
+            try {
+                val result = Shell.cmd("getenforce").exec()
+                if (result.isSuccess && result.out.isNotEmpty()) {
+                    val out = result.out.first().trim()
+                    if (out.isNotEmpty()) selinuxStatus = out
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (selinuxStatus == "unknown") {
+            try {
+                val process = Runtime.getRuntime().exec("getenforce")
+                val out = process.inputStream.bufferedReader().readLine()?.trim()
+                if (!out.isNullOrEmpty()) {
+                    selinuxStatus = out
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (selinuxStatus == "unknown") {
+            try {
+                val enforceFile = java.io.File("/sys/fs/selinux/enforce")
+                if (enforceFile.exists() && enforceFile.canRead()) {
+                    selinuxStatus = when (enforceFile.readText().trim()) {
+                        "1" -> "Enforcing"
+                        "0" -> "Permissive"
+                        else -> "unknown"
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (selinuxStatus == "unknown") {
+            try {
+                val clazz = Class.forName("android.os.SELinux")
+                val isEnforced = clazz.getMethod("isSELinuxEnforced").invoke(null) as? Boolean
+                if (isEnforced != null) {
+                    selinuxStatus = if (isEnforced) "Enforcing" else "Permissive"
+                }
+            } catch (_: Exception) {}
         }
 
         // 4. Write Settings

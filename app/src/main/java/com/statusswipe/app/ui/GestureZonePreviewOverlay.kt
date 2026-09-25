@@ -15,6 +15,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
+import com.statusswipe.app.R
 import kotlin.math.roundToInt
 
 /**
@@ -115,7 +117,7 @@ class GestureZonePreviewOverlay(private val context: Context) {
         // Subtle translucent fill
         val background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            setColor(Color.parseColor("#33FFFFFF")) // Subtle white frost
+            setColor(Color.parseColor("#1AFF1A1A")) // Semi-transparent Nothing Red
         }
 
         rootView = FrameLayout(context).apply {
@@ -126,10 +128,10 @@ class GestureZonePreviewOverlay(private val context: Context) {
 
         // Boundary line at bottom
         val line = View(context).apply {
-            setBackgroundColor(Color.parseColor("#99FFFFFF"))
+            setBackgroundColor(Color.parseColor("#66FF1A1A")) // 40% opacity Nothing Red
             val lineParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
-                (1.5f * density).toInt()
+                (0.5f * density).coerceAtLeast(1f).toInt() // 1px or closest
             ).apply {
                 gravity = Gravity.BOTTOM
             }
@@ -140,14 +142,15 @@ class GestureZonePreviewOverlay(private val context: Context) {
         // Minimal label pill
         val labelBg = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = 10 * density
-            setColor(Color.parseColor("#CC121214"))
+            cornerRadius = 50 * density
+            setColor(Color.parseColor("#000000")) // True black
+            setStroke((0.5f * density).coerceAtLeast(1f).toInt(), Color.parseColor("#3B3B3B"))
         }
 
         labelView = TextView(context).apply {
             setTextColor(Color.WHITE)
-            textSize = 10f
-            typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+            textSize = 11f
+            typeface = ResourcesCompat.getFont(context, R.font.ndot) ?: Typeface.MONOSPACE
             gravity = Gravity.CENTER
             this.background = labelBg
             setPadding((10 * density).toInt(), (3 * density).toInt(), (10 * density).toInt(), (3 * density).toInt())
