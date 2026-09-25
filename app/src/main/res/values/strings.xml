@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">StatusSwipe</string>
+    <string name="accessibility_service_name">StatusSwipe Gesture Service</string>
+    <string name="accessibility_service_description">Enables status bar swipe gestures to control screen brightness without root access. StatusSwipe only creates a touch overlay along the status bar and does not read any on-screen text or private data.</string>
+</resources>
